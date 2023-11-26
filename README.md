@@ -1,4 +1,5 @@
-# NeuralNetsNLP - 20NewsGroup Text Classification Models
+# NeuralNetsNLP
+20NewsGroup text classification models project for Queen's CMPE 452.
 
 ## Overview
 This repository contains a series of Jupyter notebooks and Python scripts implementing different NLP models for text classification of the 20NewsGroup dataset. Each model explores different neural network architectures and embeddings to classify text data.
