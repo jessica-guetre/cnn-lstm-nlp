@@ -1,5 +1,10 @@
 import re
 
+from keras.src.preprocessing.text import Tokenizer
+from keras.src.utils import pad_sequences
+
+from util.constants import ENCODED_VECTOR_SIZE
+
 # Define a list of stopwords
 STOPWORDS = {
     'the', 'and', 'is', 'in', 'to', 'of', 'it', 'you', 'that', 'a', 'i', 'for', 'on', 'with', 'this',
@@ -18,10 +23,9 @@ UNUSED_STOPWORDS = {
     'which', "couldn't", 'their', 'where', 'how', 'whom', 'same', 'or', 'can', 'didn', 'while', 'at', "hadn't",
     'own', 'needn', 'before', 'such', 'because', 'from', 'if', 'itself', 'after', 'ourselves', "it's", "should've",
     'mightn', "mustn't", 'theirs', 'when', 'all', 'about', 'will', 'being', 'above', 'ours', 'them', 'her', 'there',
-    'very', 'hasn', 'down', 'further', "won't", 'his', 'what', 'doing', 'any', "you've", 'now', 'they', 'won', 
+    'very', 'hasn', 'down', 'further', "won't", 'his', 'what', 'doing', 'any', "you've", 'now', 'they', 'won',
     'your', 'through', "aren't", 'she', 'my'
 }
-
 
 # Define regexps
 CONTRACTIONS_RE = re.compile(r"'|-|\.|!")
@@ -32,28 +36,65 @@ SPACES_RE = re.compile(r"\s+")
 CONTRACTIONS_DICT = {
     "what's": "what is",
     "n't": " not",
-    "i'm": "i am", 
+    "i'm": "i am",
     "'re": " are",
-    "'ve": " have", 
+    "'ve": " have",
     "'d": " would",
     "'ll": " will"
 }
 
+
 # Cleanup data
-def preprocess(text):
+def refine(texts):
     # Convert text to lowercase
-    text = text.lower()
+    refined_texts = []
 
-    # Remove contractions
-    text = CONTRACTIONS_RE.sub(lambda match: CONTRACTIONS_DICT.get(match.group(0), match.group(0)), text)
+    for text in texts:
+        text = text.lower()
 
-    # Remove punctuation and symbols
-    text = SYMBOLS_RE.sub(" ", text)
+        # Remove contractions
+        text = CONTRACTIONS_RE.sub(lambda match: CONTRACTIONS_DICT.get(match.group(0), match.group(0)), text)
 
-    # Remove stopwords
-    text = " ".join([word for word in text.split() if word not in STOPWORDS])
+        # Remove punctuation and symbols
+        text = SYMBOLS_RE.sub(" ", text)
 
-    # Remove extra spaces
-    text = SPACES_RE.sub(" ", text).strip()
+        # Remove stopwords
+        text = " ".join([word for word in text.split() if word not in STOPWORDS])
 
-    return text
+        # Remove extra spaces
+        text = SPACES_RE.sub(" ", text).strip()
+
+        refined_texts.append(text)
+    return refined_texts
+
+
+def initialize_tokenizer(refined_texts):
+    # Tokenize words from samples
+    tokenizer = Tokenizer()
+    tokenizer.fit_on_texts(refined_texts)
+    return tokenizer
+
+
+def get_num_words(tokenizer):
+    return len(tokenizer.word_index) + 1
+
+
+def vectorize(tokenizer, refined_texts):
+    # Convert to vectorized sequences
+    sequences = tokenizer.texts_to_sequences(refined_texts)
+
+    # Pad sequences to all be same size
+    # padded_sequences = pad_sequences(sequences)
+    padded_sequences = pad_sequences(sequences, maxlen=ENCODED_VECTOR_SIZE)
+
+    return padded_sequences
+
+
+def preprocess(texts):
+    refined_texts = refine(texts)
+    tokenizer = initialize_tokenizer(refined_texts)
+    preprocessed_texts = vectorize(tokenizer, refined_texts)
+    num_words = get_num_words(tokenizer)
+    return
+
+
