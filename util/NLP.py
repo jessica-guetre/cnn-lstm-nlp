@@ -3,6 +3,7 @@ import numpy as np
 from keras import Sequential
 from keras.src.layers import Embedding, Conv1D, MaxPooling1D, GlobalMaxPooling1D, Dense, LSTM
 import matplotlib.pyplot as plt
+from sklearn.metrics import accuracy_score
 
 from util.constants import ENCODED_VECTOR_SIZE, BATCH_SIZE, NUM_CLASSES, NUM_EPOCHS, VALIDATION_SPLIT, LSTM_SIZE, GLOVE, \
     WORD2VEC, MODEL_TYPE_CNN, MODEL_TYPE_LSTM, MODEL_TYPE_CNN_LSTM
@@ -20,6 +21,7 @@ class NLPModel:
         self.hits = None
         self.embedding_matrix = None
         self.model_history = None
+        self.accuracy = None
         if word_embedding == GLOVE:
             self.initialize_glove(embeddings)
         elif word_embedding == WORD2VEC:
@@ -110,5 +112,10 @@ class NLPModel:
         plt.ylabel('Accuracy')
         plt.legend()
         plt.show()
+
+    def evaluate(self, x_test, y_test):
+        predictions = np.argmax(self.model.predict(x_test), axis=1)
+        self.accuracy = accuracy_score(y_test, predictions)
+        print(f'Model accuracy is: {self.accuracy}')
 
 # %%
