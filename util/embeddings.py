@@ -5,7 +5,7 @@ import gensim.downloader as api
 
 def load_glove():
     embeddings_index = {}
-    with open(PATH_TO_GLOVE_FILE) as f:
+    with open(PATH_TO_GLOVE_FILE, encoding='utf8') as f:
         for line in f:
             word, coefs = line.split(maxsplit=1)
             coefs = np.fromstring(coefs, "f", sep=" ")
