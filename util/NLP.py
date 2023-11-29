@@ -1,7 +1,7 @@
 import keras
 import numpy as np
 from keras import Sequential
-from keras.src.layers import Embedding, Conv1D, MaxPooling1D, GlobalMaxPooling1D, Dense, LSTM
+from keras.layers import Embedding, Conv1D, MaxPooling1D, GlobalMaxPooling1D, Dense, LSTM, Dropout
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 
@@ -60,10 +60,16 @@ class NLPModel:
         self.model.add(Embedding(self.num_words, ENCODED_VECTOR_SIZE,
                                  embeddings_initializer=keras.initializers.Constant(self.embedding_matrix),
                                  trainable=False))
-        self.model.add(Conv1D(BATCH_SIZE, 5, activation="relu"))
+        self.model.add(Dropout(0.5))
+        self.model.add(Conv1D(ENCODED_VECTOR_SIZE, 3, activation='relu'))
         self.model.add(MaxPooling1D(3))
-        self.model.add(Conv1D(BATCH_SIZE, 5, activation="relu"))
+        self.model.add(Conv1D(ENCODED_VECTOR_SIZE, 3, activation='relu'))
+        self.model.add(MaxPooling1D(3))
+        self.model.add(Conv1D(BATCH_SIZE, 3, activation="relu"))
+        self.model.add(MaxPooling1D(3))
+        self.model.add(Conv1D(BATCH_SIZE, 3, activation="relu"))
         self.model.add(GlobalMaxPooling1D())
+        self.model.add(Dropout(0.5))
         self.model.add(Dense(NUM_CLASSES, activation='softmax'))
         self.model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
@@ -73,7 +79,10 @@ class NLPModel:
                                  embeddings_initializer=keras.initializers.Constant(self.embedding_matrix),
                                  trainable=False))
         self.model.add(LSTM(LSTM_SIZE))
-        self.model.add(Dense(BATCH_SIZE, activation='softmax'))
+        self.model.add(Dropout(0.5))
+        self.model.add(Dense(LSTM_SIZE, activation='relu'))
+        self.model.add(Dense(LSTM_SIZE / 2, activation='relu'))
+        self.model.add(Dense(NUM_CLASSES, activation='softmax'))
         self.model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
 
     def initialize_CNN_with_LSTM_model(self):
@@ -82,9 +91,15 @@ class NLPModel:
         self.model.add(
             Embedding(self.num_words, ENCODED_VECTOR_SIZE, embeddings_initializer=keras.initializers.Constant(
                 self.embedding_matrix), trainable=False))
-        self.model.add(Conv1D(BATCH_SIZE, 5, activation="relu"))
+        self.model.add(Dropout(0.5))
+        self.model.add(Conv1D(ENCODED_VECTOR_SIZE, 3, activation='relu'))
         self.model.add(MaxPooling1D(3))
-        self.model.add(Conv1D(BATCH_SIZE, 5, activation="relu"))
+        self.model.add(Conv1D(ENCODED_VECTOR_SIZE, 3, activation='relu'))
+        self.model.add(MaxPooling1D(3))
+        self.model.add(Conv1D(BATCH_SIZE, 3, activation="relu"))
+        self.model.add(MaxPooling1D(3))
+        self.model.add(Conv1D(BATCH_SIZE, 3, activation="relu"))
+        self.model.add(Dropout(0.5))
         self.model.add(LSTM(LSTM_SIZE))  # Parameter to change
         self.model.add(Dense(NUM_CLASSES, activation='softmax'))
         self.model.compile(loss="sparse_categorical_crossentropy", optimizer="adam", metrics=["accuracy"])

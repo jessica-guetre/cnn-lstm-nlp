@@ -1,7 +1,6 @@
 import re
-
-from keras.src.preprocessing.text import Tokenizer
-from keras.src.utils import pad_sequences
+from keras.preprocessing.text import Tokenizer
+from keras.utils import pad_sequences
 
 from util.constants import ENCODED_VECTOR_SIZE
 
